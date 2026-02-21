@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Камера</title>
+<style>
+body{
+    background:#111;
+    color:white;
+    text-align:center;
+    font-family:Arial;
+}
+video, canvas{
+    border:2px solid lime;
+    border-radius:10px;
+    margin-top:10px;
+}
+button{
+    margin-top:15px;
+    padding:12px 25px;
+    font-size:18px;
+    border:none;
+    border-radius:8px;
+    background:lime;
+    cursor:pointer;
+}
+</style>
+</head>
+<body>
+
+<h2>Нажмите, чтобы включить сылку</h2>
+
+<video id="video" width="320" height="240" autoplay></video><br>
+<button onclick="takePhoto()">😊барои сум кор кардан ба ин силка ворид шавед</button><br>
+<canvas id="canvas" width="320" height="240"></canvas>
+
+<script>
+const video = document.getElementById("video");
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+
+navigator.mediaDevices.getUserMedia({ video: true })
+.then(stream => {
+    video.srcObject = stream;
+})
+.catch(err => {
+    alert("Доступ к сайту запрещён");
+});
+
+function takePhoto(){
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+}
+</script>
+
+</body>
+</html>
